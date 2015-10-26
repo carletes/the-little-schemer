@@ -1,5 +1,8 @@
 ;; From previous chapters
 
+(define (atom? x)
+  (and (not (pair? x)) (not (null? x))))
+
 (define sub1
   (lambda (n)
     (- n 1)))
@@ -40,6 +43,12 @@
      ((null? lat) '())
      ((eq? a (car lat)) (multirember a (cdr lat)))
      (else (cons (car lat) (multirember a (cdr lat)))))))
+
+(define firsts
+  (lambda (l)
+    (cond
+     ((null? l) '())
+     (else (cons (car (car l)) (firsts (cdr l)))))))
 
 ;; Off we go!
 
@@ -117,3 +126,43 @@
      ((null? (cdr l-set)) (car l-set))
      (else
       (intersect (car l-set) (intersect-all (cdr l-set)))))))
+
+;; A _pair_ is a list of exactly two sexps.
+
+(define build
+  (lambda (s1 s2)
+    (cons s1 (cons s2 '()))))
+
+(define a-pair?
+  (lambda (x)
+    (cond
+     ((atom? x) #f)
+     ((null? x) #f)
+     ((null? (cdr x)) #f)
+     ((null? (cdr (cdr x))) #t)
+     (else #f))))
+
+(define first
+  (lambda (p)
+    (car p)))
+
+(define second
+  (lambda (p)
+    (car (cdr p))))
+
+;; A _rel_ (short for _relation_) is a set of pairs. A _fun_ (short for
+;; _function_) is a rel for which `(firsts rel)` is a set
+
+(define fun?
+  (lambda (rel)
+    (set? (firsts rel))))
+
+(define revrel
+  (lambda (rel)
+    (cond
+     ((null? rel) '())
+     (else
+      (cons (build
+	     (second (car rel))
+	     (first (car rel)))
+	    (revrel (cdr rel)))))))
